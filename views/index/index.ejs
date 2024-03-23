@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canteen Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        #product-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        #product-list li {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        
+        #product-list li .product-name {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        #product-list li button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 7px;
+            margin-left: 50px;
+        }
+        
+        #product-list li button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Product List</h1>
+        <ul id="product-list"></ul>
+    </div>
+
+    <!-- Include Socket.IO library -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        const products = [
+            { id: 1, name: "Sandwich", price: 5.0 },
+            { id: 2, name: "Coffee", price: 2.5 },
+            // Add more products as needed
+        ];
+
+        let orderDetailsWindow; // Reference to the order details window
+        let orderDetailsOpened = false; // Flag to track whether the order details window is opened or not
+
+        // Function to display products
+        function displayProducts() {
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = ''; // Clear previous list
+
+            products.forEach(product => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <span class="product-name">${product.name} - $${product.price}</span>
+                    <button onclick="buyProduct(${product.id}, '${product.name}')">Buy</button>
+                `;
+                productList.appendChild(listItem);
+            });
+        }
+
+        // Function to send a POST request to the server to generate a token
+        function sendPostRequest(productId, productName) {
+            return fetch('/generateToken', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json(); // Parse the JSON response
+                } else {
+                    throw new Error('Failed to generate token');
+                }
+            })
+            .catch(error => {
+                console.error('Error generating token:', error);
+                throw error;
+            });
+        }
+
+        // Function to fetch and display order details
+        function displayOrderDetails(tokenNumber) {
+            fetch(`/orderDetails/${tokenNumber}`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        throw new Error('Failed to fetch order details');
+                    }
+                })
+                .then(data => {
+                    if (!orderDetailsOpened) {
+                        // Open a new tab with the order details page if not already opened
+                        orderDetailsWindow = window.open('', '_blank'); // Specify target attribute '_blank'
+                        orderDetailsOpened = true; // Set the flag to true
+                    }
+                    orderDetailsWindow.document.write(data); // Write data to the order details window
+                })
+                .catch(error => {
+                    console.error('Error fetching order details:', error);
+                });
+        }
+
+        // Function to handle buying a product
+        function buyProduct(productId, productName) {
+            // Call the function to send a POST request to generate a token
+            sendPostRequest(productId, productName)
+                .then(data => {
+                    // Fetch and display order details
+                    displayOrderDetails(data.number);
+                })
+                .catch(error => {
+                    console.error('Error buying product:', error);
+                });
+        }
+
+        // Call displayProducts function when the page loads
+        window.onload = () => {
+            displayProducts();
+        };
+
+        // Socket.IO connection to the server
+        const socket = io();
+
+        // Function to handle receiving a new token
+        socket.on('newToken', (tokenNumber) => {
+            // Update the UI with the new token number
+            const orderReadyList = document.getElementById('order-ready');
+            const listItem = document.createElement('li');
+            listItem.textContent = `Token Number: ${tokenNumber}`;
+            orderReadyList.appendChild(listItem);
+        });
+    </script>
+</body>
+</html>

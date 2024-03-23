@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="2">
+    <title>Token Number Display</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js" integrity="sha384-nyAoF2aAQJWFK6NkmXv5e+5uIZh7zNEN45FgCw8zjISZgyD/3KXwSM2SyGLbVZGP" crossorigin="anonymous"></script>
+</head>
+<body>
+    <h1>Token Numbers</h1>
+    <ul id="token-list"></ul>
+
+    <script>
+        const socket = io('http://localhost:3000');
+        const tokenList = document.getElementById('token-list');
+
+        // Initial token numbers
+        socket.on('initialTokens', (tokens) => {
+            updateTokenList(tokens);
+        });
+
+        // Update token numbers
+        socket.on('tokenUpdate', (tokens) => {
+            updateTokenList(tokens);
+        });
+
+        // Update token list in the HTML
+        function updateTokenList(tokens) {
+            tokenList.innerHTML = '';
+            tokens.forEach(token => {
+                const listItem = document.createElement('li');
+                listItem.textContent = token;
+                tokenList.appendChild(listItem);
+            });
+        }
+    </script>
+</body>
+</html>

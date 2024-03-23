@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canteen Management</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <h1>Product List</h1>
+    <ul id="product-list"></ul>
+    <div id="order-details"></div> <!-- Container for order details -->
+
+    <!-- Include Socket.IO library -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        const products = [
+            { id: 1, name: "Sandwich", price: 5.0 },
+            { id: 2, name: "Coffee", price: 2.5 },
+            // Add more products as needed
+        ];
+
+        // Function to display products
+        function displayProducts() {
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = ''; // Clear previous list
+
+            products.forEach(product => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${product.name} - $${product.price}`;
+                const buyButton = document.createElement('button');
+                buyButton.textContent = 'Buy';
+                buyButton.addEventListener('click', () => buyProduct(product.id, product.name));
+                listItem.appendChild(buyButton);
+                productList.appendChild(listItem);
+            });
+        }
+
+        // Function to send a POST request to the server to generate a token
+        function sendPostRequest(productId, productName) {
+            return fetch('/generateToken', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Token number stored successfully.');
+                    // Return the generated token number
+                    return response.json();
+                } else {
+                    console.error('Failed to store token number:', response.statusText);
+                    throw new Error('Failed to store token number');
+                }
+            })
+            .catch(error => {
+                console.error('Error storing token number:', error);
+                throw error;
+            });
+        }
+
+        // Function to fetch and display order details
+        function displayOrderDetails(productId, productName, tokenNumber) {
+            fetch(`/orderDetails?productId=${productId}&productName=${encodeURIComponent(productName)}&tokenNumber=${tokenNumber}`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        throw new Error('Failed to fetch order details');
+                    }
+                })
+                .then(data => {
+                    // Update the order details container with the fetched content
+                    const orderDetailsContainer = document.getElementById('order-details');
+                    orderDetailsContainer.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error fetching order details:', error);
+                });
+        }
+
+        // Function to simulate order placement and token generation
+        function buyProduct(productId, productName) {
+            // Call the function to send a POST request to generate a token
+            sendPostRequest(productId, productName).then(tokenNumber => {
+                // Fetch and display order details
+                displayOrderDetails(productId, productName, tokenNumber);
+            }).catch(error => {
+                console.error('Error generating token number:', error);
+            });
+        }
+
+        // Call displayProducts function when the page loads
+        window.onload = () => {
+            displayProducts();
+        };
+
+        // Socket.IO connection to the server
+        const socket = io();
+
+        // Function to handle receiving a new token
+        socket.on('newToken', (tokenNumber) => {
+            // Update the UI with the new token number
+            const orderReadyList = document.getElementById('order-ready');
+            const listItem = document.createElement('li');
+            listItem.textContent = `Token Number: ${tokenNumber}`;
+            orderReadyList.appendChild(listItem);
+        });
+    </script>
+</body>
+</html>

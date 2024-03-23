@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Header styles */
+        header {
+            background-color: #0a2847; /* Dark blue color */
+            color: #fff; /* White text */
+            text-align: center; /* Center-align text */
+            padding: 20px 0; /* Add padding to top and bottom */
+            margin-bottom: 20px; /* Add margin to bottom */
+        }
+
+        /* Header text styles */
+        header h1 {
+            margin: 0; /* Remove default margin */
+        }
+
+        p {
+            font-size: 40px;
+            border: 5px 5px;
+        }
+
+        * {
+            scroll-margin: auto;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>ISA-VESIT</h1>
+</header>
+
+<div class="order-details">
+    <!-- Token numbers are displayed dynamically -->
+    <!-- Example token number with class "token-number" -->
+    <p class="token-number"><%= token.number %></p>
+    <!-- Include other details from the token object as needed -->
+</div>
+
+<script>
+    // Get all elements with the class "token-number"
+    var tokenNumberElements = document.getElementsByClassName("token-number");
+
+    // Function to remove each token number element after 5 seconds
+    for (var i = 0; i < tokenNumberElements.length; i++) {
+        setTimeout((function(index) {
+            return function() {
+                tokenNumberElements[index].style.display = "none";
+            }
+        })(i), 5000 * (i + 1)); // Delay each removal by 5 seconds
+    }
+</script>
+
+</body>
+</html>
