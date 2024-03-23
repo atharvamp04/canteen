@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Canteen Management</title>
     <style>
+                /* Reset CSS */
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+        
+
+                /* Custom Fonts */
+                @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -16,90 +26,328 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         
         h1 {
             text-align: center;
             margin-bottom: 20px;
+            color: #333;
+            font-weight: 600;
+            font-size: 24px;
         }
-        
+
+        /* Styles for tabs */
+        .tab {
+            overflow: hidden;
+
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center; /* Center-align the tab buttons */
+        }
+
+        /* Style the tab buttons */
+        .tab button {
+            background-color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 15px; /* Reduce padding to make the buttons shorter */
+            transition: background-color 0.3s ease;
+            border-radius: 5px 5px 0 0;
+            margin: 0 auto; /* Center-align the tab buttons */
+        }
+
+        /* Change background color of the active tab button */
+        .tab button.active {
+            background-color: #6c63ff;
+            color: #fff;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+
+        /* Show the active tab */
+        .tabcontent.active {
+            display: block;
+        }
+
         #product-list {
             list-style: none;
             padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
         
         #product-list li {
             background-color: #fff;
-            border: 1px solid #ccc;
-            margin-bottom: 10px;
-            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .product-list li:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-name {
+            margin-right: 20px;
+            color: #333;
+            font-weight: 500;
+            font-size: 18px;
+        }
+
+        .product-price {
+            color: #555;
+            font-weight: 500;
+            font-size: 18px;
         }
         
-        #product-list li .product-name {
-            display: inline-block;
-            margin-right: 10px;
+        .counter {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
         }
         
-        #product-list li button {
-            background-color: #007bff;
+        .counter button {
+            background-color: #6c63ff;
             color: #fff;
             border: none;
-            padding: 5px 10px;
+            outline: none;
             cursor: pointer;
-            border-radius: 7px;
-            margin-left: 50px;
+            border-radius: 50%;
+            padding: 8px;
+            margin: 0 5px;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
         }
         
-        #product-list li button:hover {
+        .counter button:hover {
             background-color: #0056b3;
         }
+        
+        .counter span {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #buy-button {
+            display: block;
+            margin: 0 auto;
+            background-color: #6c63ff;
+            color: #fff;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            border-radius: 10px;
+            padding: 12px 40px;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #buy-button:hover {
+            background-color: #2f2beb;
+        }
+
+        #total-price-box {
+            margin-top: 20px;
+            text-align: center;
+            background-color: #6c63ff;
+            color: #fff;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .parent{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+            padding: 8px;
+            margin-top: 8px;
+            border-radius: 10px;
+        }
+
+        ul{
+            list-style-type: none;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Product List</h1>
-        <ul id="product-list"></ul>
-    </div>
+        <h1>Menu</h1>
 
+        <!-- Tabs -->
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'tab1')">Breakfast</button>
+            <button class="tablinks" onclick="openTab(event, 'tab2')">Lunch</button>
+        </div>
+
+        <!-- Tab content -->
+        <div id="tab1" class="tabcontent active">
+            <ul id="product-list-1" class="product-list"></ul>
+        </div>
+        <div id="tab2" class="tabcontent">
+            <ul id="product-list-2" class="product-list"></ul>
+        </div>
+
+        <button id="buy-button" onclick="buyProducts()">Buy</button>
+    </div>
+    <div id="total-price-box">Total: ₹<span id="total-price">0</span></div>
     <!-- Include Socket.IO library -->
     <script src="/socket.io/socket.io.js"></script>
 
     <script>
-        const products = [
-            { id: 1, name: "Sandwich", price: 5.0 },
-            { id: 2, name: "Coffee", price: 2.5 },
-            // Add more products as needed
+        const productsTab1 = [
+            { id: 1, name: "Sandwich", price: 50 },
+            { id: 2, name: "Coffee", price: 25 },
+            { id: 3, name: "Tea", price: 20 }
+        ];
+
+        const productsTab2 = [
+            { id: 4, name: "Burger", price: 70 },
+            { id: 5, name: "French Fries", price: 40 },
+            { id: 6, name: "Pizza", price: 120 }
         ];
 
         let orderDetailsWindow; // Reference to the order details window
         let orderDetailsOpened = false; // Flag to track whether the order details window is opened or not
 
-        // Function to display products
-        function displayProducts() {
-            const productList = document.getElementById('product-list');
-            productList.innerHTML = ''; // Clear previous list
+        // Function to display products for a specific tab
+        function displayProducts(tabId, productList) {
+            const productListElement = document.getElementById(tabId);
+            productListElement.innerHTML = ''; // Clear previous list
 
-            products.forEach(product => {
+            productList.forEach(product => {
                 const listItem = document.createElement('li');
                 listItem.innerHTML = `
-                    <span class="product-name">${product.name} - $${product.price}</span>
-                    <button onclick="buyProduct(${product.id}, '${product.name}')">Buy</button>
-                `;
-                productList.appendChild(listItem);
+                <div class="parent">
+                <div class="product-details">
+                    <span class="product-name">${product.name}</span>
+                    <span class="product-price">₹${product.price}</span>
+                </div>
+                <div class="counter">
+                    <button onclick="decrementCounter(this)">-</button>
+                    <span>0</span>
+                    <button onclick="incrementCounter(this)">+</button>
+                </div>
+            </div>
+            `;            
+                productListElement.appendChild(listItem);
             });
         }
 
+        // Function to open a specific tab
+        function openTab(evt, tabId) {
+            // Hide all tab contents and remove the 'active' class from tab buttons
+            const tabcontents = document.getElementsByClassName('tabcontent');
+            for (let tabcontent of tabcontents) {
+                tabcontent.classList.remove('active');
+            }
+            const tablinks = document.getElementsByClassName('tablinks');
+            for (let tablink of tablinks) {
+                tablink.classList.remove('active');
+            }
+
+            // Show the clicked tab content and set the 'active' class to the clicked tab button
+            document.getElementById(tabId).classList.add('active');
+            evt.currentTarget.classList.add('active');
+
+            // Display products for the selected tab
+            if (tabId === 'tab1') {
+                displayProducts('product-list-1', productsTab1);
+            } else if (tabId === 'tab2') {
+                displayProducts('product-list-2', productsTab2);
+            }
+        }
+
+        // Function to increment the counter
+        function incrementCounter(button) {
+            const counter = button.parentNode.querySelector('span');
+            let count = parseInt(counter.textContent);
+            count++;
+            counter.textContent = count;
+            updateTotalPrice();
+        }
+
+        // Function to decrement the counter
+        function decrementCounter(button) {
+            const counter = button.parentNode.querySelector('span');
+            let count = parseInt(counter.textContent);
+            if (count > 0) {
+                count--;
+                counter.textContent = count;
+                updateTotalPrice();
+            }
+        }
+        // Function to buy products
+function buyProducts() {
+    const selectedProducts = [];
+    const counters1 = document.querySelectorAll('#product-list-1 .counter span');
+    const counters2 = document.querySelectorAll('#product-list-2 .counter span');
+
+    counters1.forEach((counter, index) => {
+        const quantity = parseInt(counter.textContent);
+        if (quantity > 0) {
+            selectedProducts.push({ id: productsTab1[index].id, name: productsTab1[index].name, quantity: quantity });
+        }
+    });
+
+    counters2.forEach((counter, index) => {
+        const quantity = parseInt(counter.textContent);
+        if (quantity > 0) {
+            selectedProducts.push({ id: productsTab2[index].id, name: productsTab2[index].name, quantity: quantity });
+        }
+    });
+
+    if (selectedProducts.length > 0) {
+        // Call the function to send a POST request to generate a token
+        sendPostRequest(selectedProducts)
+            .then(data => {
+                // Fetch and display order details
+                displayOrderDetails(data.number);
+            })
+            .catch(error => {
+                console.error('Error buying products:', error);
+            });
+    } else {
+        console.log('No products selected to buy.');
+    }
+
+    // Reset all counters to zero
+    const allCounters = document.querySelectorAll('.counter span');
+    allCounters.forEach(counter => {
+        counter.textContent = 0;
+    });
+
+    // Reset the total price
+    document.getElementById('total-price').textContent = 0;
+}
+
         // Function to send a POST request to the server to generate a token
-        function sendPostRequest(productId, productName) {
+        function sendPostRequest(selectedProducts) {
             return fetch('/generateToken', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({})
+                body: JSON.stringify({ products: selectedProducts })
             })
             .then(response => {
                 if (response.ok) {
@@ -113,6 +361,24 @@
                 throw error;
             });
         }
+
+        // Function to calculate and update the total price
+       // Function to calculate and update the total price
+function updateTotalPrice() {
+    const counters1 = document.querySelectorAll('#product-list-1 .counter span');
+    const counters2 = document.querySelectorAll('#product-list-2 .counter span');
+    let totalPrice = 0;
+
+    counters1.forEach((counter, index) => {
+        totalPrice += parseInt(counter.textContent) * productsTab1[index].price;
+    });
+
+    counters2.forEach((counter, index) => {
+        totalPrice += parseInt(counter.textContent) * productsTab2[index].price;
+    });
+
+    document.getElementById('total-price').textContent = totalPrice;
+}
 
         // Function to fetch and display order details
         function displayOrderDetails(tokenNumber) {
@@ -137,35 +403,11 @@
                 });
         }
 
-        // Function to handle buying a product
-        function buyProduct(productId, productName) {
-            // Call the function to send a POST request to generate a token
-            sendPostRequest(productId, productName)
-                .then(data => {
-                    // Fetch and display order details
-                    displayOrderDetails(data.number);
-                })
-                .catch(error => {
-                    console.error('Error buying product:', error);
-                });
-        }
-
         // Call displayProducts function when the page loads
         window.onload = () => {
-            displayProducts();
+            displayProducts('product-list-1', productsTab1);
+            updateTotalPrice();
         };
-
-        // Socket.IO connection to the server
-        const socket = io();
-
-        // Function to handle receiving a new token
-        socket.on('newToken', (tokenNumber) => {
-            // Update the UI with the new token number
-            const orderReadyList = document.getElementById('order-ready');
-            const listItem = document.createElement('li');
-            listItem.textContent = `Token Number: ${tokenNumber}`;
-            orderReadyList.appendChild(listItem);
-        });
     </script>
 </body>
 </html>
