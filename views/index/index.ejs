@@ -218,25 +218,7 @@
         </div>
 
         <button id="buy-button" onclick="buyProducts()">Buy</button>
-        <h1>Menu</h1>
 
-        <!-- Tabs -->
-        <div class="tab">
-            <button class="tablinks active" onclick="openTab(event, 'tab1')">Breakfast</button>
-            <button class="tablinks" onclick="openTab(event, 'tab2')">Lunch</button>
-        </div>
-
-        <!-- Tab content -->
-        <div id="tab1" class="tabcontent active">
-            <ul id="product-list-1" class="product-list"></ul>
-        </div>
-        <div id="tab2" class="tabcontent">
-            <ul id="product-list-2" class="product-list"></ul>
-        </div>
-
-        <button id="buy-button" onclick="buyProducts()">Buy</button>
-    </div>
-    <div id="total-price-box">Total: ₹<span id="total-price">0</span></div>
     <!-- Include Socket.IO library -->
     <script src="/socket.io/socket.io.js"></script>
 
@@ -251,17 +233,8 @@
             { id: 4, name: "Burger", price: 70 },
             { id: 5, name: "French Fries", price: 40 },
             { id: 6, name: "Pizza", price: 120 }
-        const productsTab1 = [
-            { id: 1, name: "Sandwich", price: 50 },
-            { id: 2, name: "Coffee", price: 25 },
-            { id: 3, name: "Tea", price: 20 }
         ];
 
-        const productsTab2 = [
-            { id: 4, name: "Burger", price: 70 },
-            { id: 5, name: "French Fries", price: 40 },
-            { id: 6, name: "Pizza", price: 120 }
-        ];
 
         let orderDetailsWindow; // Reference to the order details window
         let orderDetailsOpened = false; // Flag to track whether the order details window is opened or not
@@ -270,12 +243,6 @@
         function displayProducts(tabId, productList) {
             const productListElement = document.getElementById(tabId);
             productListElement.innerHTML = ''; // Clear previous list
-        // Function to display products for a specific tab
-        function displayProducts(tabId, productList) {
-            const productListElement = document.getElementById(tabId);
-            productListElement.innerHTML = ''; // Clear previous list
-
-            productList.forEach(product => {
             productList.forEach(product => {
                 const listItem = document.createElement('li');
                 listItem.innerHTML = `
@@ -383,7 +350,7 @@ function buyProducts() {
 }
 
         // Function to send a POST request to the server to generate a token
-        function sendPostRequest(selectedProducts) {
+
         function sendPostRequest(selectedProducts) {
             return fetch('/generateToken', {
                 method: 'POST',
@@ -391,7 +358,7 @@ function buyProducts() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ products: selectedProducts })
-                body: JSON.stringify({ products: selectedProducts })
+
             })
             .then(response => {
                 if (response.ok) {
@@ -423,7 +390,7 @@ function updateTotalPrice() {
 
     document.getElementById('total-price').textContent = totalPrice;
 }
-        }
+        
 
         // Function to calculate and update the total price
        // Function to calculate and update the total price
@@ -468,9 +435,6 @@ function updateTotalPrice() {
 
         // Call displayProducts function when the page loads
         window.onload = () => {
-            displayProducts('product-list-1', productsTab1);
-            updateTotalPrice();
-        };
             displayProducts('product-list-1', productsTab1);
             updateTotalPrice();
         };
