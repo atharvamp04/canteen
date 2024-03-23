@@ -19,9 +19,18 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            box-sizing: border-box;
         }
-        
+
+        /* Custom Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
+
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f0f0;
+        }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -30,7 +39,7 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        
+
         h1 {
             text-align: center;
             margin-bottom: 20px;
@@ -124,6 +133,7 @@
             color: #fff;
             border: none;
             outline: none;
+            outline: none;
             cursor: pointer;
             border-radius: 50%;
             padding: 8px;
@@ -208,12 +218,39 @@
         </div>
 
         <button id="buy-button" onclick="buyProducts()">Buy</button>
+        <h1>Menu</h1>
+
+        <!-- Tabs -->
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'tab1')">Breakfast</button>
+            <button class="tablinks" onclick="openTab(event, 'tab2')">Lunch</button>
+        </div>
+
+        <!-- Tab content -->
+        <div id="tab1" class="tabcontent active">
+            <ul id="product-list-1" class="product-list"></ul>
+        </div>
+        <div id="tab2" class="tabcontent">
+            <ul id="product-list-2" class="product-list"></ul>
+        </div>
+
+        <button id="buy-button" onclick="buyProducts()">Buy</button>
     </div>
     <div id="total-price-box">Total: ₹<span id="total-price">0</span></div>
     <!-- Include Socket.IO library -->
     <script src="/socket.io/socket.io.js"></script>
 
     <script>
+        const productsTab1 = [
+            { id: 1, name: "Sandwich", price: 50 },
+            { id: 2, name: "Coffee", price: 25 },
+            { id: 3, name: "Tea", price: 20 }
+        ];
+
+        const productsTab2 = [
+            { id: 4, name: "Burger", price: 70 },
+            { id: 5, name: "French Fries", price: 40 },
+            { id: 6, name: "Pizza", price: 120 }
         const productsTab1 = [
             { id: 1, name: "Sandwich", price: 50 },
             { id: 2, name: "Coffee", price: 25 },
@@ -233,7 +270,12 @@
         function displayProducts(tabId, productList) {
             const productListElement = document.getElementById(tabId);
             productListElement.innerHTML = ''; // Clear previous list
+        // Function to display products for a specific tab
+        function displayProducts(tabId, productList) {
+            const productListElement = document.getElementById(tabId);
+            productListElement.innerHTML = ''; // Clear previous list
 
+            productList.forEach(product => {
             productList.forEach(product => {
                 const listItem = document.createElement('li');
                 listItem.innerHTML = `
@@ -342,11 +384,13 @@ function buyProducts() {
 
         // Function to send a POST request to the server to generate a token
         function sendPostRequest(selectedProducts) {
+        function sendPostRequest(selectedProducts) {
             return fetch('/generateToken', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                body: JSON.stringify({ products: selectedProducts })
                 body: JSON.stringify({ products: selectedProducts })
             })
             .then(response => {
@@ -360,6 +404,25 @@ function buyProducts() {
                 console.error('Error generating token:', error);
                 throw error;
             });
+        }
+
+        // Function to calculate and update the total price
+       // Function to calculate and update the total price
+function updateTotalPrice() {
+    const counters1 = document.querySelectorAll('#product-list-1 .counter span');
+    const counters2 = document.querySelectorAll('#product-list-2 .counter span');
+    let totalPrice = 0;
+
+    counters1.forEach((counter, index) => {
+        totalPrice += parseInt(counter.textContent) * productsTab1[index].price;
+    });
+
+    counters2.forEach((counter, index) => {
+        totalPrice += parseInt(counter.textContent) * productsTab2[index].price;
+    });
+
+    document.getElementById('total-price').textContent = totalPrice;
+}
         }
 
         // Function to calculate and update the total price
@@ -405,6 +468,9 @@ function updateTotalPrice() {
 
         // Call displayProducts function when the page loads
         window.onload = () => {
+            displayProducts('product-list-1', productsTab1);
+            updateTotalPrice();
+        };
             displayProducts('product-list-1', productsTab1);
             updateTotalPrice();
         };
